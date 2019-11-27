@@ -1,0 +1,56 @@
+version: '3.1'
+
+services:
+  postgres_db_host:
+    hostname: postgres
+    container_name: postgres_db_host
+    build: docker-images/postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker-data/postgres:/var/lib/postgresql/data
+      - ./docker-images/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      # - ./docker-images/postgres/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      # - ./docker-images/postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    environment:
+      POSTGRES_USER: main_user
+      POSTGRES_PASSWORD: super_password
+      POSTGRES_DB: main_db
+      POSTGRES_DBNAME: main_db
+      SSL: 'on'
+      SSL_CERT_FILE: /var/lib/postgresql/server.crt
+      SSL_KEY_FILE: /var/lib/postgresql/server.key
+
+    command: 
+      postgres -c config_file=/etc/postgresql/postgresql.conf
+
+    restart: always
+
+  pgadmin4_host:
+    hostname: pgadmin4
+    container_name: pgadmin4_host
+    build: docker-images/pgadmin4
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "super-email@domain.com"
+      PGADMIN_DEFAULT_PASSWORD: "super_password"
+    depends_on:
+      - "postgres_db_host"
+
+# 192.168.0.140
+
+# - POSTGRES_USER=
+# - POSTGRES_PASSWORD=
+# - POSTGRES_DB=
+# - POSTGRES_DBNAME=
+# - SSL=on
+# - SSL_CERT_FILE=/var/lib/postgresql/server.crt
+# - SSL_KEY_FILE=/var/lib/postgresql/server.key
+
+# -e SSL_CERT_FILE=/your/own/ssl_cert_file.pem
+# -e SSL_KEY_FILE=/your/own/ssl_key_file.key
+# -e SSL_CA_FILE=/your/own/ssl_ca_file.pem
+# -e DEFAULT_ENCODING="UTF8"
+# -e DEFAULT_COLLATION="en_US.UTF-8"
+# -e DEFAULT_CTYPE="en_US.UTF-8"
